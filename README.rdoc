@@ -1,3 +1,26 @@
 = MercatorMpay24
 
-This project rocks and uses MIT-LICENSE.
+MercatorMpay24 provides an payment gateway to MPay 24 for the Mercator Guided Selling Application.
+
+This project uses the GPL V3 license. See file LICENSE in the same directory for details about the GPL V3.
+
+# Installation instructions
+
+1. Put in your Gemfile
+'''ruby
+gem "mercator_mpay24"
+'''
+2. Instell gem by running
+'''ruby
+bundle install
+'''
+3.2 Get all migrations into your app by running in your ipp directory
+'''ruby
+rake mercator_mesonic:install:migrations
+'''
+4. Run Migrations added
+'''ruby
+rake db:migrate
+'''
+5. Mount the Engine in your routes.rb
+mount MercatorMesonic::Engine => "/mercator_mpay24"
