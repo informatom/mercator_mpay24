@@ -1,10 +1,10 @@
-= MercatorMpay24
+# MercatorMpay24
 
 MercatorMpay24 provides an payment gateway to MPay 24 for the Mercator Guided Selling Application.
 
 This project uses the GPL V3 license. See file LICENSE in the same directory for details about the GPL V3.
 
-# Installation instructions
+## Installation instructions
 
 1. Put in your Gemfile
 '''ruby
