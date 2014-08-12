@@ -4,14 +4,12 @@ module OrdersControllerExtensions
   included do
     def payment
       begin
-        cart_xml = @cart.to_mpay24_xml(order_id: self.this.erp_order_number,customer: self.this.user)
-        mpay24_response = MercatorMpay24::Gateway.new( IvellioVellin.mpay24_merchant_id, self.this.erp_order_number, cart_xml )
-                                       .get_response
-        # @wmbi_url = "https://test.mPAY24.com/app/bin/checkout/payment/f5c4fac03f524881a0b5fc1f8ff03063\n"
+        mpay24_response = MercatorMpay24::Gateway.new(merchant_id: Constant.find_by_key("mpay24_merchant_id").value,
+                                                      tid: self.this.erp_order_number,
+                                                      order_xml: self.this.to_mpay24_xml)
+                                                 .get_response
         @wmbi_url = mpay24_response['LOCATION'].try(:first)
-
         render :action => :payment
-
       rescue Exception => e
         puts "MPAY24 EXCEPTION : #{e}"
         render :action => :payment_error

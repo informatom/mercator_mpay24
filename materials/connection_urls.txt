@@ -18,3 +18,5 @@ MDXI%5BOrder%5D%5BPrice%5D=0.10&MDXI%5BOrder%5D%5BTid%5D=200905180719-31
 i.e.: MDXI[Order][Price]=0.10&MDXI[Order][Tid]=200905180719-31
 
 hash =  {"Tid"=>"200905180719-31", "Price"=>"0.10"}
+
+@wmbi_url = "https://test.mPAY24.com/app/bin/checkout/payment/f5c4fac03f524881a0b5fc1f8ff03063\n"
