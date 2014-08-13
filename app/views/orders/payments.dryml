@@ -1,0 +1,12 @@
+<show-page>
+  <field-list: replace>
+    <payment-frame/>
+  </field-list>
+</show-page>
+
+<def tag="payment-frame">
+  <div class="dv_cart">
+    <style type="text/css" media="screen">#wmbiFrame {height:491px; width:920px; border: 0;}</style>
+    <iframe id="wmbiFrame" src="&@wmbi_url"></iframe>
+  </div>
+</def>
