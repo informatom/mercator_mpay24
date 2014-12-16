@@ -39,6 +39,5 @@ module OrdersControllerExtensions
         puts "Error: Response is not of the expected format."
       end
     end
-
   end
 end
