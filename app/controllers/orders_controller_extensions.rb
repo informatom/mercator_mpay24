@@ -4,7 +4,7 @@ module OrdersControllerExtensions
   included do
     def payment
       begin
-        mpay24_response = MercatorMpay24::Gateway.new(merchant_id: Constant.find_by_key("mpay24_merchant_id").value,
+        mpay24_response = MercatorMpay24::Gateway.new(merchant_id: Constant.find_by_key("mpay_test_username").value,
                                                       tid: self.this.erp_order_number,
                                                       order_xml: self.this.to_mpay24_xml)
                                                  .get_response
@@ -16,7 +16,6 @@ module OrdersControllerExtensions
       end
     end
 
-    # Implements the test request from the MPay24 SOAP Specification Handbook, page 54
     def test_payment
       client = Savon.client(basic_auth: ["u" + Constant.find_by_key("mpay_test_username").value,
                                          Constant.find_by_key("mpay_test_password").value ],
@@ -29,12 +28,10 @@ module OrdersControllerExtensions
 
       response = client.call(:select_payment,
                               message: {merchantID: Constant.find_by_key("mpay_test_username").value,
-                                        mdxi: {"Order" => {"Tid" => "cust9126", "Price" => "10.00"}}})
-
-      puts "The following line should be an url like: https://test.mpay24.com/app/bin/checkout/payment/%SOMEID%"
+                                        mdxi: {"Order" => {"Tid" => "0815/4711", "Price" => "12.34"}}})
 
       if response.body[:select_payment_response]
-        puts response.body[:select_payment_response][:location]
+        redirect_to response.body[:select_payment_response][:location]
       else
         puts "Error: Response is not of the expected format."
       end
