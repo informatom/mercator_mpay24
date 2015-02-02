@@ -35,14 +35,28 @@ module Mpay24OrderExtensions
         merchant_id = MERCHANT_TEST_ID
     end
 
-    MercatorMpay24::Payment.create(merchant_id: merchant_id, tid: erp_order_number,
-                                   order_xml: XmlMessage.new(order: self, merchant_id: merchant_id), order_id: id)
+    payment = MercatorMpay24::Payment.create(merchant_id: merchant_id,
+                                             order_id: id)
+    payment.update(order_xml: XmlMessage.new(order: self,
+                                             merchant_id: merchant_id,
+                                             tid: payment.id).to_s,
+                   tid: payment.id)
 
-    client.call(:select_payment, message: XmlMessage.new(order: self, merchant_id: merchant_id))
+    puts Order::MPAY_TEST_CLIENT.operation(:select_payment)
+                                .build(message: XmlMessage.new(order: self,
+                                       merchant_id: merchant_id,
+                                       tid: payment.id))
+                                .to_s
+
+    response = client.call(:select_payment,
+                           message: XmlMessage.new(order: self,
+                                                   merchant_id: merchant_id,
+                                                   tid: payment.id))
+    return response
   end
 
   class XmlMessage
-    attr_accessor(:order, :merchant_id)
+    attr_accessor(:order, :merchant_id, :tid)
 
     def initialize(params)
       params.each do |key, value|
@@ -51,28 +65,34 @@ module Mpay24OrderExtensions
     end
 
     def to_s()
-      xml = Builder::XmlMarkup.new( :indent => 2 )
-      xml.instruct! :xml, :encoding => "UTF-8"
-      xml.merchant_id merchant_id
+      xml = Builder::XmlMarkup.new()
+      xml.merchantID merchant_id
       xml.mdxi do
         xml.Order do
-          xml.Tid order.erp_order_number
-          xml.Price order.sum_incl_vat
+          xml.Tid tid
           xml.ShoppingCart do
             xml.Description order.name
-            xml.ShippingCosts(order.shipping_cost, "Tax" => order.shipping_cost_vat)
-            xml.Tax order.vat
-            xml.Discount order.discount
             order.lineitems.each do |lineitem|
               xml.Item do
                 xml.Number lineitem.position
                 xml.ProductNr lineitem.product_number
-                xml.Description lineitem.description
-                xml.Quantity lineitem.amount
-                xml.ItemPrice lineitem.product_price
-                xml.Price lineitem.value
+                xml.Description lineitem.description.tr("\n\r\t","   ")
+                xml.Quantity lineitem.amount.to_i
+                xml.ItemPrice sprintf( "%0.02f", lineitem.product_price)
+                xml.Price sprintf( "%0.02f", lineitem.value)
               end
             end
+            xml.ShippingCosts(sprintf( "%0.02f", order.shipping_cost),
+                              "Tax" => sprintf( "%0.02f", order.shipping_cost_vat) )
+            xml.Tax sprintf( "%0.02f", order.vat)
+            xml.Discount sprintf( "%0.02f", order.discount)
+          end
+          xml.Price sprintf( "%0.02f", order.sum_incl_vat)
+          xml.URL do
+            xml.Success "http://localhost:3000/order/return"
+            xml.Error "http://localhost:3000/order/return"
+            xml.Confirmation "http://localhost:3000/order/return"
+            xml.Cancel "http://localhost:3000/order/return"
           end
         end
       end

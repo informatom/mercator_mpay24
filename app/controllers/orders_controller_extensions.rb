@@ -3,26 +3,30 @@ module OrdersControllerExtensions
 
   included do
     def test_payment
-      client = Order.test_cliest
-      response = client.call(:select_payment, xml: xml_test_message)
+      # Request.body to console
+      puts ap(Order::MPAY_TEST_CLIENT.operation(:select_payment)
+                                  .build(message: XmlTestMessage.new)
+                                  .to_s)
 
-      if response.body[:select_payment_response]
+      response = Order::MPAY_TEST_CLIENT.call(:select_payment, message: XmlTestMessage.new)
+
+      if response.body[:select_payment_response][:location]
         redirect_to response.body[:select_payment_response][:location]
       else
-        puts "Error: Response is not of the expected format."
+        puts "Error:" + response.body[:select_payment_response][:err_text]
       end
     end
   end
 
-  private
-  def xml_test_message
-    xml = Builder::XmlMarkup.new( :indent => 2 )
-    xml.instruct! :xml, :encoding => "UTF-8"
-    xml.merchant_id Order::MERCHANT_TEST_ID
-    xml.mdxi do
-      xml.Order do
-        xml.Tid "0815/4711"
-        xml.Price "12.34"
+  class XmlTestMessage
+    def to_s()
+      xml = Builder::XmlMarkup.new()
+      xml.merchantID Order::MERCHANT_TEST_ID
+      xml.mdxi do
+        xml.Order do
+          xml.Tid "0815/4711"
+          xml.Price "12.34"
+        end
       end
     end
   end
