@@ -20,6 +20,7 @@ module MercatorMpay24
       profile_status :string
       filter_status  :string
       appr_code      :string
+      timestamps
     end
 
     attr_accessible :operation, :tid, :status, :price, :currency, :p_type, :brand, :mpaytid,
@@ -27,7 +28,7 @@ module MercatorMpay24
                     :profile_status, :filter_status, :appr_code
     has_paper_trail
 
-    # belongs_to :payment
+    belongs_to :payment
 
     # --- Permissions --- #
     def create_permitted?
