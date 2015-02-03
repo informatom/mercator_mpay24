@@ -17,6 +17,7 @@ module MercatorMpay24
       customer_email :string
       language       :string
       customer_id    :string
+      profile_id     :string
       profile_status :string
       filter_status  :string
       appr_code      :string
@@ -25,7 +26,7 @@ module MercatorMpay24
 
     attr_accessible :operation, :tid, :status, :price, :currency, :p_type, :brand, :mpaytid,
                     :user_field, :orderdesc, :customer, :customer_email, :language, :customer_id,
-                    :profile_status, :filter_status, :appr_code
+                    :profile_id, :profile_status, :filter_status, :appr_code, :payment_id, :payment
     has_paper_trail
 
     belongs_to :payment

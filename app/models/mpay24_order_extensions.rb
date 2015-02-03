@@ -89,10 +89,10 @@ module Mpay24OrderExtensions
           end
           xml.Price sprintf( "%0.02f", order.sum_incl_vat)
           xml.URL do
-            xml.Success "http://localhost:3000/order/return"
-            xml.Error "http://localhost:3000/order/return"
-            xml.Confirmation "http://localhost:3000/order/return"
-            xml.Cancel "http://localhost:3000/order/return"
+            xml.Success "http://localhost:3000/order/success"
+            xml.Error "http://localhost:3000/order/error"
+            xml.Confirmation "http://www.informatom.com/mercator_mpay24/confirmation"
+            xml.Cancel "http://localhost:3000/order/cancel"
           end
         end
       end
