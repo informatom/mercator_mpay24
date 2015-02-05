@@ -3,13 +3,14 @@ module MercatorMpay24
     hobo_model
 
     fields do
-      merchant_id :string
-      tid         :string
-      order_xml   :text
+      merchant_id     :string
+      tid             :string
+      user_field_hash :string
+      order_xml       :text
       timestamps
     end
 
-    attr_accessible :merchant_id, :tid, :order_xml, :order, :order_id
+    attr_accessible :merchant_id, :tid, :order_xml, :order, :order_id, :user_field_hash
     has_paper_trail
 
     belongs_to :order

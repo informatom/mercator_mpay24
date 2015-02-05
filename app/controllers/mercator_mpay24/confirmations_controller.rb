@@ -43,13 +43,18 @@ module MercatorMpay24
         when *["RESERVED", "SUSPENDED"]
           nil
         when "BILLED"
-          @order.lifecycle.successful_payment!(User.find_by(surname: "MPay24"))
-          if Rails.application.config.try(:erp) == "mesonic" && Rails.env == "production"
-            # A quick ckeck, if erp_account_number is current
-            # (User could have been changed since last job run)
-            @order.user.update_erp_account_nr()
+          # Security Check in case of AP spoofing
+          if @order.user_field_hash == @confirmation.user_field
+            @order.lifecycle.successful_payment!(User.find_by(surname: "MPay24"))
+            if Rails.application.config.try(:erp) == "mesonic" && Rails.env == "production"
+              # A quick ckeck, if erp_account_number is current
+              # (User could have been changed since last job run)
+              @order.user.update_erp_account_nr()
 
-            @order.push_to_mesonic()
+              @order.push_to_mesonic()
+            end
+          else
+            @order.lifecycle.failing_payment!(User.find_by(surname: "MPay24"))
           end
       end
 

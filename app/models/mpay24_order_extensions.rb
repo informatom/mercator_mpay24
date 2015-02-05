@@ -3,7 +3,7 @@ module Mpay24OrderExtensions
   extend ActiveSupport::Concern
 
   included do
-    has_many :payments
+    has_many :payments, :class_name => "MercatorMpay24::Payment"
   end
 
   MERCHANT_TEST_ID = Constant.find_by_key("mpay_test_username").value
@@ -35,28 +35,24 @@ module Mpay24OrderExtensions
         merchant_id = MERCHANT_TEST_ID
     end
 
-    payment = MercatorMpay24::Payment.create(merchant_id: merchant_id,
-                                             order_id: id)
-    payment.update(order_xml: XmlMessage.new(order: self,
-                                             merchant_id: merchant_id,
-                                             tid: payment.id).to_s,
-                   tid: payment.id)
+    payment = MercatorMpay24::Payment.create(merchant_id: merchant_id, order_id: id )
+    user_field_hash = Digest::SHA256.hexdigest (payment.id.to_s + self.sum_incl_vat.to_s + "EUR" +
+                                     Time.now.to_s + SecureRandom.hex)
+    payment.update(user_field_hash: user_field_hash, tid: payment.id)
+    xml_message = XmlMessage.new(order: self, payment: payment)
+    payment.update(order_xml: xml_message.to_s )
 
-    puts Order::MPAY_TEST_CLIENT.operation(:select_payment)
-                                .build(message: XmlMessage.new(order: self,
-                                       merchant_id: merchant_id,
-                                       tid: payment.id))
-                                .to_s
+#   Console Output for Debugging:
+#   puts Order::MPAY_TEST_CLIENT.operation(:select_payment)
+#                               .build(message: XmlMessage.new(order: self, payment: payment))
+#                               .to_s
 
-    response = client.call(:select_payment,
-                           message: XmlMessage.new(order: self,
-                                                   merchant_id: merchant_id,
-                                                   tid: payment.id))
+    response = client.call(:select_payment, message: xml_message)
     return response
   end
 
   class XmlMessage
-    attr_accessor(:order, :merchant_id, :tid)
+    attr_accessor(:order, :payment)
 
     def initialize(params)
       params.each do |key, value|
@@ -66,10 +62,11 @@ module Mpay24OrderExtensions
 
     def to_s()
       xml = Builder::XmlMarkup.new()
-      xml.merchantID merchant_id
+      xml.merchantID payment.merchant_id
       xml.mdxi do
         xml.Order do
-          xml.Tid tid
+          xml.UserField payment.user_field_hash
+          xml.Tid payment.id
           xml.ShoppingCart do
             xml.Description order.name
             order.lineitems.each do |lineitem|
