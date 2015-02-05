@@ -35,5 +35,26 @@ module MercatorMpay24
     end
 
     #--- Instance Methods ---#
+    def check_transaction_status
+      case Rails.env
+        when "production"
+          client = Order::MPAY_PRODUCTION_CLIENT
+          merchant_id = Order::MERCHANT_PRODUCTION_ID
+        else
+          client = Order::MPAY_TEST_CLIENT
+          merchant_id = Order::MERCHANT_TEST_ID
+      end
+
+      response = client.call(:transaction_status, message: {merchantID: merchant_id ,
+                                                            tid: self.tid })
+
+      @confirmation = Confirmation.new()
+      response.body[:transaction_status_response][:parameter].each do |hash|
+        @confirmation.assign_attributes(hash[:name].downcase => hash[:value])
+        @confirmation.payment_id = @confirmation.tid
+      end
+      @confirmation.save
+      @confirmation.update_order
+    end
   end
 end

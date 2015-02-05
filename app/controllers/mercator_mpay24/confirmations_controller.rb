@@ -35,28 +35,8 @@ module MercatorMpay24
                                    filter_status:  params[:FILTER_STATUS],
                                    appr_code:      params[:APPR_CODE],
                                    payment_id:     params[:TID])
-      @order = @confirmation.payment.order
 
-      case @confirmation.status
-        when *["ERROR", "REVERSED", "CREDITED"]
-          @order.lifecycle.failing_payment!(User.find_by(surname: "MPay24"))
-        when *["RESERVED", "SUSPENDED"]
-          nil
-        when "BILLED"
-          # Security Check in case of AP spoofing
-          if @order.user_field_hash == @confirmation.user_field
-            @order.lifecycle.successful_payment!(User.find_by(surname: "MPay24"))
-            if Rails.application.config.try(:erp) == "mesonic" && Rails.env == "production"
-              # A quick ckeck, if erp_account_number is current
-              # (User could have been changed since last job run)
-              @order.user.update_erp_account_nr()
-
-              @order.push_to_mesonic()
-            end
-          else
-            @order.lifecycle.failing_payment!(User.find_by(surname: "MPay24"))
-          end
-      end
+      @confirmation.update_order
 
       render nothing: true
     end
