@@ -4,5 +4,5 @@ end
 
 MercatorMpay24::Engine.routes.draw do
   get 'confirmation' => 'confirmations#create', :as => 'create_confirmation'
-  get 'admin/payments/:id/check_confirmation' => 'admin/payments#check_confirmation'
+  get 'admin/payments/:id/check_confirmation' => 'admin/payments#check_confirmation', :as => 'check_confirmation'
 end
