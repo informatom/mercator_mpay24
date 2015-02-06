@@ -49,12 +49,18 @@ module MercatorMpay24
                                                             tid: self.tid })
 
       @confirmation = Confirmation.new()
-      response.body[:transaction_status_response][:parameter].each do |hash|
-        @confirmation.assign_attributes(hash[:name].downcase => hash[:value])
-        @confirmation.payment_id = @confirmation.tid
+      if response.body[:transaction_status_response][:status] = "ERROR"
+        @confirmation.assign_attributes(status: response.body[:transaction_status_response][:return_code],
+                                        payment_id: self.id)
+        @confirmation.save
+      else
+        response.body[:transaction_status_response][:parameter].each do |hash|
+          @confirmation.assign_attributes(hash[:name].downcase => hash[:value])
+          @confirmation.payment_id = self.id
+        end
+        @confirmation.save
+        @confirmation.update_order
       end
-      @confirmation.save
-      @confirmation.update_order
     end
   end
 end
