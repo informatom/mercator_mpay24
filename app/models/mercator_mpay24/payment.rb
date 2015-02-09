@@ -49,7 +49,7 @@ module MercatorMpay24
                                                             tid: self.tid })
 
       @confirmation = Confirmation.new()
-      if response.body[:transaction_status_response][:status] = "ERROR"
+      if response.body[:transaction_status_response][:status] == "ERROR"
         @confirmation.assign_attributes(status: response.body[:transaction_status_response][:return_code],
                                         payment_id: self.id)
         @confirmation.save
