@@ -13,6 +13,7 @@ module OrdersControllerExtensions
       if response.body[:select_payment_response][:location]
         redirect_to response.body[:select_payment_response][:location]
       else
+        render :show
         puts "Error:" + response.body[:select_payment_response][:err_text]
       end
     end

@@ -86,10 +86,10 @@ module Mpay24OrderExtensions
           end
           xml.Price sprintf( "%0.02f", order.sum_incl_vat)
           xml.URL do
-            xml.Success "http://localhost:3000/order/success"
-            xml.Error "http://localhost:3000/order/error"
-            xml.Confirmation "http://www.informatom.com/mercator_mpay24/confirmation"
-            xml.Cancel "http://localhost:3000/order/cancel"
+            xml.Success Rails.application.routes.url_helpers.payment_status_order_url(order.id)
+            xml.Error Rails.application.routes.url_helpers.payment_status_order_url(order.id)
+            xml.Confirmation "http://www.informatom.com/mercator_mpay24/confirmation" # !FIXME
+            xml.Cancel Rails.application.routes.url_helpers.payment_status_order_url(order)
           end
         end
       end
