@@ -6,7 +6,7 @@ module Mpay24OrderExtensions
     has_many :payments, :class_name => "MercatorMpay24::Payment"
   end
 
-  MERCHANT_TEST_ID = Constant.find_by_key("mpay_test_username").try(:value)
+  MERCHANT_TEST_ID = Constant.find_by_key("mpay_test_username").try(:value) || ""
   MPAY_TEST_CLIENT =
     Savon.client(basic_auth: ["u" + MERCHANT_TEST_ID,
                                     Constant.find_by_key("mpay_test_password").try(:value) ],
@@ -15,7 +15,7 @@ module Mpay24OrderExtensions
                  logger: Rails.logger, log_level: :info, log: true, pretty_print_xml: true)
 
 
-  MERCHANT_PRODUCTION_ID = Constant.find_by_key("mpay_production_username").try(:value)
+  MERCHANT_PRODUCTION_ID = Constant.find_by_key("mpay_production_username").try(:value) || ""
   MPAY_PRODUCTION_CLIENT =
     Savon.client(basic_auth: ["u" + MERCHANT_PRODUCTION_ID,
                                     Constant.find_by_key("mpay_test_password").try(:value) ],
