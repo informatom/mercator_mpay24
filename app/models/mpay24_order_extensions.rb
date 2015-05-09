@@ -6,7 +6,7 @@ module Mpay24OrderExtensions
     has_many :payments, :class_name => "MercatorMpay24::Payment"
   end
 
-  if defined? Constant?
+  if defined? Constant
     MERCHANT_TEST_ID = Constant.find_by_key("mpay_test_username").try(:value) || ""
     MPAY_TEST_CLIENT =
       Savon.client(basic_auth: ["u" + MERCHANT_TEST_ID,
