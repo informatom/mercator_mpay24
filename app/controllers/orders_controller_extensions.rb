@@ -3,12 +3,13 @@ module OrdersControllerExtensions
 
   included do
     def test_payment
-      # Request.body to console
-      puts ap(Order::MPAY_TEST_CLIENT.operation(:select_payment)
-                                  .build(message: XmlTestMessage.new)
-                                  .to_s)
+      # HAS:20140606 Uncomment to puts Request.body to console
+      # puts ap(Order::MPAY_TEST_CLIENT.operation(:select_payment)
+      #                                .build(message: XmlTestMessage.new)
+      #                                .to_s)
 
-      response = Order::MPAY_TEST_CLIENT.call(:select_payment, message: XmlTestMessage.new)
+      @test_message = XmlTestMessage.new
+      response = Order::MPAY_TEST_CLIENT.call(:select_payment, message: @test_message)
 
       if response.body[:select_payment_response][:location]
         redirect_to response.body[:select_payment_response][:location]

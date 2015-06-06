@@ -6,7 +6,7 @@ module Mpay24OrderExtensions
     has_many :payments, :class_name => "MercatorMpay24::Payment"
   end
 
-  if defined? Constant
+  if Constant.table_exists?
     MERCHANT_TEST_ID = Constant.find_by_key("mpay_test_username").try(:value) || ""
     MPAY_TEST_CLIENT =
       Savon.client(basic_auth: ["u" + MERCHANT_TEST_ID,
@@ -14,7 +14,6 @@ module Mpay24OrderExtensions
                    wsdl: "https://test.mpay24.com/soap/etp/1.5/ETP.wsdl",
                    endpoint: "https://test.mpay24.com/app/bin/etpproxy_v15",
                    logger: Rails.logger, log_level: :info, log: true, pretty_print_xml: true)
-
 
     MERCHANT_PRODUCTION_ID = Constant.find_by_key("mpay_production_username").try(:value) || ""
     MPAY_PRODUCTION_CLIENT =
