@@ -16,7 +16,9 @@ module MercatorMpay24
     belongs_to :order
     has_many :confirmations
 
+
     # --- Permissions --- #
+
     def create_permitted?
       true
     end
@@ -34,7 +36,9 @@ module MercatorMpay24
       acting_user.sales?
     end
 
+
     #--- Instance Methods ---#
+
     def check_transaction_status
       case Rails.env
         when "production"
@@ -50,14 +54,13 @@ module MercatorMpay24
 
       @confirmation = Confirmation.new()
       if response.body[:transaction_status_response][:status] == "ERROR"
-        @confirmation.assign_attributes(status: response.body[:transaction_status_response][:return_code],
-                                        payment_id: self.id)
+        @confirmation.assign_attributes(status: response.body[:transaction_status_response][:return_code], payment_id: self.id)
         @confirmation.save
       else
         response.body[:transaction_status_response][:parameter].each do |hash|
           @confirmation.assign_attributes(hash[:name].downcase => hash[:value])
-          @confirmation.payment_id = self.id
         end
+        @confirmation.payment_id = self.id
         @confirmation.save
         @confirmation.update_order
       end

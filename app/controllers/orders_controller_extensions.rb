@@ -3,7 +3,7 @@ module OrdersControllerExtensions
 
   included do
     def test_payment
-      # HAS:20140606 Uncomment to puts Request.body to console
+      # HAS:20140606 Uncomment to print Request.body
       # puts ap(Order::MPAY_TEST_CLIENT.operation(:select_payment)
       #                                .build(message: XmlTestMessage.new)
       #                                .to_s)
