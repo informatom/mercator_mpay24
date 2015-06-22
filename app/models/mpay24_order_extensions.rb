@@ -88,7 +88,7 @@ module Mpay24OrderExtensions
           xml.URL do
             xml.Success Rails.application.routes.url_helpers.payment_status_order_url(order.id)
             xml.Error Rails.application.routes.url_helpers.payment_status_order_url(order.id)
-            xml.Confirmation "http://www.informatom.com/mercator_mpay24/confirmation" # !FIXME
+            xml.Confirmation Rails.application.routes.url_helpers.check_confirmation_url
             xml.Cancel Rails.application.routes.url_helpers.payment_status_order_url(order)
           end
         end
