@@ -7,7 +7,7 @@ module Mpay24OrderExtensions
   end
 
   if Constant.table_exists?
-    MERCHANT_TEST_ID = Constant.find_by_key("mpay_test_username").try(:value) || ""
+    MERCHANT_TEST_ID = Constant.find_by_key("mpay_test_username").try(:value) || "undefined"
     MPAY_TEST_CLIENT =
       Savon.client(basic_auth: ["u" + MERCHANT_TEST_ID,
                                       Constant.find_by_key("mpay_test_password").try(:value) ],
@@ -15,7 +15,7 @@ module Mpay24OrderExtensions
                    endpoint: "https://test.mpay24.com/app/bin/etpproxy_v15",
                    logger: Rails.logger, log_level: :info, log: true, pretty_print_xml: true)
 
-    MERCHANT_PRODUCTION_ID = Constant.find_by_key("mpay_production_username").try(:value) || ""
+    MERCHANT_PRODUCTION_ID = Constant.find_by_key("mpay_production_username").try(:value) || "undefined"
     MPAY_PRODUCTION_CLIENT =
       Savon.client(basic_auth: ["u" + MERCHANT_PRODUCTION_ID,
                                       Constant.find_by_key("mpay_test_password").try(:value) ],
@@ -28,27 +28,27 @@ module Mpay24OrderExtensions
   def pay(system: nil)
     case system
       when "production"
-        client = MPAY_PRODUCTION_CLIENT
-        merchant_id = MERCHANT_PRODUCTION_ID
+        @client = MPAY_PRODUCTION_CLIENT
+        @merchant_id = MERCHANT_PRODUCTION_ID
       else
-        client = MPAY_TEST_CLIENT
-        merchant_id = MERCHANT_TEST_ID
+        @client = MPAY_TEST_CLIENT
+        @merchant_id = MERCHANT_TEST_ID
     end
 
-    payment = MercatorMpay24::Payment.create(merchant_id: merchant_id, order_id: id )
-    user_field_hash = Digest::SHA256.hexdigest (payment.id.to_s + self.sum_incl_vat.to_s + "EUR" +
+    @payment = MercatorMpay24::Payment.create(merchant_id: @merchant_id, order_id: id )
+    user_field_hash = Digest::SHA256.hexdigest (@payment.id.to_s + self.sum_incl_vat.to_s + "EUR" +
                                      Time.now.to_s + SecureRandom.hex)
-    payment.update(user_field_hash: user_field_hash, tid: payment.id)
-    xml_message = XmlMessage.new(order: self, payment: payment)
-    payment.update(order_xml: xml_message.to_s )
+    @payment.update(user_field_hash: user_field_hash, tid: @payment.id)
+    @xml_message = XmlMessage.new(order: self, payment: @payment)
+    @payment.update(order_xml: @xml_message.to_s )
 
 #   Console Output for Debugging:
 #   puts Order::MPAY_TEST_CLIENT.operation(:select_payment)
-#                               .build(message: XmlMessage.new(order: self, payment: payment))
+#                               .build(message: XmlMessage.new(order: self, payment: @payment))
 #                               .to_s
 
-    response = client.call(:select_payment, message: xml_message)
-    return response
+    @response = @client.call(:select_payment, message: @xml_message)
+    return @response
   end
 
   class XmlMessage
@@ -88,8 +88,8 @@ module Mpay24OrderExtensions
           xml.URL do
             xml.Success Rails.application.routes.url_helpers.payment_status_order_url(order.id)
             xml.Error Rails.application.routes.url_helpers.payment_status_order_url(order.id)
-            xml.Confirmation Rails.application.routes.url_helpers.check_confirmation_url
-            xml.Cancel Rails.application.routes.url_helpers.payment_status_order_url(order)
+            xml.Confirmation Rails.application.routes.url_helpers.create_confirmation_url
+            xml.Cancel Rails.application.routes.url_helpers.payment_status_order_url(order.id)
           end
         end
       end
