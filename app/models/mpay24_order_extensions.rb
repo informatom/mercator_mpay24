@@ -47,6 +47,10 @@ module Mpay24OrderExtensions
 #                               .build(message: XmlMessage.new(order: self, payment: @payment))
 #                               .to_s
 
+    logger.info Order::MPAY_TEST_CLIENT.operation(:select_payment)
+                                       .build(message: XmlMessage.new(order: self, payment: @payment))
+                                       .to_s
+
     @response = @client.call(:select_payment, message: @xml_message)
     return @response
   end
@@ -86,10 +90,10 @@ module Mpay24OrderExtensions
           end
           xml.Price sprintf( "%0.02f", order.sum_incl_vat)
           xml.URL do
-            xml.Success Rails.application.routes.url_helpers.payment_status_order_url(order.id)
-            xml.Error Rails.application.routes.url_helpers.payment_status_order_url(order.id)
-            xml.Confirmation Rails.application.routes.url_helpers.create_confirmation_url
-            xml.Cancel Rails.application.routes.url_helpers.payment_status_order_url(order.id)
+            xml.Success Rails.application.routes.url_helpers.payment_status_order_url(order.id, domain: ::Constant::SHOPDOMAIN)
+            xml.Error Rails.application.routes.url_helpers.payment_status_order_url(order.id, domain: ::Constant::SHOPDOMAIN)
+            xml.Confirmation Rails.application.routes.url_helpers.create_confirmation_url(domain: ::Constant::SHOPDOMAIN)
+            xml.Cancel Rails.application.routes.url_helpers.payment_status_order_url(order.id, domain: ::Constant::SHOPDOMAIN)
           end
         end
       end
