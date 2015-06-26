@@ -19,8 +19,8 @@ module Mpay24OrderExtensions
     MPAY_PRODUCTION_CLIENT =
       Savon.client(basic_auth: ["u" + MERCHANT_PRODUCTION_ID,
                                       Constant.find_by_key("mpay_test_password").try(:value) ],
-                   wsdl: "FIXME!",
-                   endpoint: "FIXME!",
+                   wsdl: "https://www.mpay24.com/soap/etp/1.5/ETP.wsdl",
+                   endpoint: "https://www.mpay24.com/app/bin/etpproxy_v15",
                    logger: Rails.logger, log_level: :info, log: true, pretty_print_xml: true)
   end
 
