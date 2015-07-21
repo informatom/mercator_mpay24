@@ -43,9 +43,9 @@ module Mpay24OrderExtensions
     @payment.update(order_xml: @xml_message.to_s )
 
 #   Console Output for Debugging:
-    puts Order::MPAY_PRODUCTION_CLIENT.operation(:select_payment)
-                                .build(message: XmlMessage.new(order: self, payment: @payment))
-                                .to_s
+    #puts Order::MPAY_PRODUCTION_CLIENT.operation(:select_payment)
+    #                            .build(message: XmlMessage.new(order: self, payment: @payment))
+    #                            .to_s
 
     logger.info Order::MPAY_PRODUCTION_CLIENT.operation(:select_payment)
                                              .build(message: XmlMessage.new(order: self, payment: @payment))
