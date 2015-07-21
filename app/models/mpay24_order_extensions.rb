@@ -18,7 +18,7 @@ module Mpay24OrderExtensions
     MERCHANT_PRODUCTION_ID = Constant.find_by_key("mpay_production_username").try(:value) || "undefined"
     MPAY_PRODUCTION_CLIENT =
       Savon.client(basic_auth: ["u" + MERCHANT_PRODUCTION_ID,
-                                      Constant.find_by_key("mpay_test_password").try(:value) ],
+                                      Constant.find_by_key("mpay_production_password").try(:value) ],
                    wsdl: "https://www.mpay24.com/soap/etp/1.5/ETP.wsdl",
                    endpoint: "https://www.mpay24.com/app/bin/etpproxy_v15",
                    logger: Rails.logger, log_level: :info, log: true, pretty_print_xml: true)
@@ -43,13 +43,13 @@ module Mpay24OrderExtensions
     @payment.update(order_xml: @xml_message.to_s )
 
 #   Console Output for Debugging:
-#   puts Order::MPAY_TEST_CLIENT.operation(:select_payment)
-#                               .build(message: XmlMessage.new(order: self, payment: @payment))
-#                               .to_s
+    puts Order::MPAY_PRODUCTION_CLIENT.operation(:select_payment)
+                                .build(message: XmlMessage.new(order: self, payment: @payment))
+                                .to_s
 
-    logger.info Order::MPAY_TEST_CLIENT.operation(:select_payment)
-                                       .build(message: XmlMessage.new(order: self, payment: @payment))
-                                       .to_s
+    logger.info Order::MPAY_PRODUCTION_CLIENT.operation(:select_payment)
+                                             .build(message: XmlMessage.new(order: self, payment: @payment))
+                                             .to_s
 
     @response = @client.call(:select_payment, message: @xml_message)
     return @response
