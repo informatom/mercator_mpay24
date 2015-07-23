@@ -47,7 +47,8 @@ module Mpay24OrderExtensions
     #                            .build(message: XmlMessage.new(order: self, payment: @payment))
     #                            .to_s
 
-    logger.info Order::MPAY_PRODUCTION_CLIENT.operation(:select_payment)
+    debugger
+    logger.info Order::MPAY_TEST_CLIENT.operation(:select_payment)
                                              .build(message: XmlMessage.new(order: self, payment: @payment))
                                              .to_s
 
