@@ -13,7 +13,9 @@ module Mpay24OrderExtensions
                                       Constant.find_by_key("mpay_test_password").try(:value) ],
                    wsdl: "https://test.mpay24.com/soap/etp/1.5/ETP.wsdl",
                    endpoint: "https://test.mpay24.com/app/bin/etpproxy_v15",
-                   logger: Rails.logger, log_level: :info, log: true, pretty_print_xml: true)
+                   logger: Rails.logger, log_level: :info, log: true, pretty_print_xml: true,
+                   adapter: :net_http)
+    # Set adapter explicitly from httpi 2.4.1 on according to https://github.com/savonrb/httpi/issues/148
 
     MERCHANT_PRODUCTION_ID = Constant.find_by_key("mpay_production_username").try(:value) || "undefined"
     MPAY_PRODUCTION_CLIENT =
@@ -21,7 +23,8 @@ module Mpay24OrderExtensions
                                       Constant.find_by_key("mpay_production_password").try(:value) ],
                    wsdl: "https://www.mpay24.com/soap/etp/1.5/ETP.wsdl",
                    endpoint: "https://www.mpay24.com/app/bin/etpproxy_v15",
-                   logger: Rails.logger, log_level: :info, log: true, pretty_print_xml: true)
+                   logger: Rails.logger, log_level: :info, log: true, pretty_print_xml: true,
+                   adapter: :net_http)
   end
 
   # --- Instance Methods --- #
@@ -47,10 +50,9 @@ module Mpay24OrderExtensions
     #                            .build(message: XmlMessage.new(order: self, payment: @payment))
     #                            .to_s
 
-    debugger
     logger.info Order::MPAY_TEST_CLIENT.operation(:select_payment)
-                                             .build(message: XmlMessage.new(order: self, payment: @payment))
-                                             .to_s
+                                       .build(message: XmlMessage.new(order: self, payment: @payment))
+                                       .to_s
 
     @response = @client.call(:select_payment, message: @xml_message)
     return @response
