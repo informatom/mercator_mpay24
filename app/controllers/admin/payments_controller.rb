@@ -1,4 +1,6 @@
 class Admin::PaymentsController < ::Admin::AdminSiteController
+  skip_before_filter :admin_required
+  before_filter :sales_required
 
   def check_confirmation
     @payment = MercatorMpay24::Payment.find(params[:id])
