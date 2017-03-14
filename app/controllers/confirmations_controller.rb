@@ -11,7 +11,7 @@ class ConfirmationsController < ApplicationController
 
   def create
     # IP -Adress-Restriction: [locale requests, MPay24 productive system, MPay24 test system]
-    unless ["127.0.0.1", "213.164.25.245", "213.164.23.169", "80.110.33.39"].include?(request.ip)
+    unless ["127.0.0.1", "213.164.25.245", "213.164.23.169", "178.190.236.94"].include?(request.ip)
       raise "Request to payment gateway from illegal address: " + request.ip
     end
 
@@ -24,7 +24,7 @@ class ConfirmationsController < ApplicationController
                                                         brand:          params[:BRAND],
                                                         mpaytid:        params[:MPAYTID],
                                                         user_field:     params[:USER_FIELD],
-                                                        orderdesc:      params[:ORDERDESC],
+                                                        orderdesc:      params[:ORDERDESC].encode('utf-8', 'iso-8859-1'),
                                                         customer:       params[:CUSTOMER],
                                                         customer_email: params[:CUSTOMER_EMAIL],
                                                         language:       params[:LANGUAGE],
