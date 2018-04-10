@@ -10,9 +10,15 @@ class ConfirmationsController < ApplicationController
   # stati ERROR, RESERVED, BILLED, REVERSED, CREDITED, SUSPENDED
 
   def create
-    # IP -Adress-Restriction: [locale requests, MPay24 productive system, MPay24 test system]
-    unless ["127.0.0.1", "213.164.25.245", "213.164.23.169", "178.190.236.94"].include?(request.ip)
-      raise "Request to payment gateway from illegal address: " + request.ip
+    # IP -Adress-Restriction: [local requests, MPay24 productive system, MPay24 test system]
+    request_ip = request.ip # to make testing easier
+
+    unless (request_ip == "127.0.0.1" ||
+            request_ip == "213.164.23.169" ||
+            request_ip == "178.190.236.94" ||
+            (request_ip >= "213.164.25.224" && request_ip <= "213.164.25.255") ||
+            (request_ip >= "217.175.200.16" && request_ip <= "217.175.200.32"))
+      raise "Request to payment gateway from illegal address: " + request_ip
     end
 
     @confirmation = MercatorMpay24::Confirmation.create(operation:      params[:OPERATION],
